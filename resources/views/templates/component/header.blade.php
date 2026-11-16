@@ -11,7 +11,17 @@
     </div>
     <div class="w3l_sign_in_register">
       <ul>
-        <li><a href="#" data-toggle="modal" data-target="#myModal">Login</a></li>
+        @auth
+          <li style="color:#fff;">
+            <a href="{{ route('profile.edit') }}">{{ auth()->user()->name }}{{ auth()->user()->isAdmin() ? ' (Admin)' : '' }}</a>
+          </li>
+          <li>
+            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+            <form id="logout-form" action="{{ route('logout') }}" method="post" style="display:none;">@csrf</form>
+          </li>
+        @else
+          <li><a href="#" data-toggle="modal" data-target="#myModal">Login</a></li>
+        @endauth
       </ul>
     </div>
     <div class="clearfix"> </div>

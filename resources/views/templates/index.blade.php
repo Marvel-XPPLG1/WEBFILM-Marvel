@@ -30,6 +30,25 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 		</ul>
   </nav>
 </div>
+<!-- flash message -->
+<div class="container" style="margin-top:15px;">
+	@if (session('success'))
+		<div class="alert alert-success">{{ session('success') }}</div>
+	@endif
+	@if (session('error'))
+		<div class="alert alert-danger">{{ session('error') }}</div>
+	@endif
+	@if ($errors->any() && !old('_form'))
+		<div class="alert alert-danger">
+			<ul style="margin:0;">
+				@foreach ($errors->all() as $error)
+					<li>{{ $error }}</li>
+				@endforeach
+			</ul>
+		</div>
+	@endif
+</div>
+<!-- //flash message -->
 <!-- /w3l-medile-movies-grids -->
 @yield('content')
 	<!-- //comedy-w3l-agileits -->

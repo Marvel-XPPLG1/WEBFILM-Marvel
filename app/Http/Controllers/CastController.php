@@ -3,64 +3,55 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cast;
-use App\Http\Requests\StoreCastRequest;
-use App\Http\Requests\UpdateCastRequest;
+use Illuminate\Http\Request;
 
 class CastController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    private function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:45',
+            'age'  => 'required|integer|min:0|max:150',
+            'bio'  => 'required|string',
+        ];
+    }
+
     public function index()
     {
-        //
+        $items = Cast::orderBy('id')->paginate(15);
+
+        return view('admin.casts.index', compact('items'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('admin.casts.form', ['item' => new Cast()]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCastRequest $request)
+    public function store(Request $request)
     {
-        //
+        Cast::create($request->validate($this->rules()));
+
+        return redirect()->route('admin.casts.index')->with('success', 'Cast ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Cast $cast)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Cast $cast)
     {
-        //
+        return view('admin.casts.form', ['item' => $cast]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateCastRequest $request, Cast $cast)
+    public function update(Request $request, Cast $cast)
     {
-        //
+        $cast->update($request->validate($this->rules()));
+
+        return redirect()->route('admin.casts.index')->with('success', 'Cast diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Cast $cast)
     {
-        //
+        $cast->perans()->delete();
+        $cast->delete();
+
+        return redirect()->route('admin.casts.index')->with('success', 'Cast dihapus.');
     }
 }

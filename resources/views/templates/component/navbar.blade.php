@@ -36,6 +36,21 @@
               </ul>
             </li>
             <li class="w3_home_act {{ Route::current()->getName() == 'movies' ? 'active' : '' }}"><a href="{{ route('movies') }}">Movies</a></li>
+            @auth
+              @if (auth()->user()->isAdmin())
+                <li class="dropdown {{ str_starts_with(Route::current()->getName() ?? '', 'admin.') ? 'active' : '' }}">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{{ route('admin.films.index') }}">Data Film</a></li>
+                    <li><a href="{{ route('admin.casts.index') }}">Data Cast</a></li>
+                    <li><a href="{{ route('admin.genres.index') }}">Data Genre</a></li>
+                    <li><a href="{{ route('admin.perans.index') }}">Data Peran</a></li>
+                    <li><a href="{{ route('admin.users.index') }}">List User</a></li>
+                  </ul>
+                </li>
+              @endif
+              <li class="w3_home_act {{ Route::current()->getName() == 'profile.edit' ? 'active' : '' }}"><a href="{{ route('profile.edit') }}">Profile</a></li>
+            @endauth
 
           </ul>
         </nav>

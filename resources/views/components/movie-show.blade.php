@@ -59,7 +59,7 @@
                       <tbody>
                         @foreach ($perans as $peran)
                         <tr>
-                          <td class="w3-list-info">{{ $peran->cast_id }}</td>
+                          <td class="w3-list-info">{{ $peran->cast->name ?? '-' }}</td>
                           <td class="w3-list-info">{{ $peran->actor }}</td>
                         </tr>
                         @endforeach
@@ -118,23 +118,35 @@
           <div class="all-comments-info">
             <a href="#">Comments</a>
             <div class="agile-info-wthree-box">
-              <form>
-                <input type="text" placeholder="Name" required="">			           					   
-                <input type="text" placeholder="Email" required="">
-                <input type="text" placeholder="Phone" required="">
-                <textarea placeholder="Message" required=""></textarea>
-                <input type="submit" value="SEND">
-                <div class="clearfix"> </div>
-              </form>
+              @guest
+                <p>Silakan <a href="#" data-toggle="modal" data-target="#myModal">login</a> untuk memberikan komentar.</p>
+              @else
+                @if (auth()->user()->isAdmin())
+                  <p>Administrator tidak dapat memberikan komentar pada film.</p>
+                @else
+                  <form action="{{ route('kritik.store', $film->id) }}" method="post">
+                    @csrf
+                    <select name="rating" required="" style="color:#000;margin-bottom:10px;">
+                      <option value="">Rating</option>
+                      @for ($r = 5; $r >= 1; $r--)
+                        <option value="{{ $r }}" {{ old('rating') == $r ? 'selected' : '' }}>{{ $r }} / 5</option>
+                      @endfor
+                    </select>
+                    <textarea name="comment" placeholder="Komentar / kritik" required="">{{ old('comment') }}</textarea>
+                    <input type="submit" value="SEND">
+                    <div class="clearfix"> </div>
+                  </form>
+                @endif
+              @endguest
             </div>
           </div>
           <div class="media-grids">
             @foreach ($comments as $comment)
               <div class="media">
-                <h5>{{ $comment->user_id }}</h5>
+                <h5>{{ $comment->user->name ?? 'User' }} ({{ $comment->rating }}/5)</h5>
                 <div class="media-left">
                   <a href="#">
-                    <img src="{{ asset('storage/images/user.jpg') }}" title="One movies" alt=" " />
+                    <img src="{{ asset('template/images/user.jpg') }}" title="One movies" alt=" " />
                   </a>
                 </div>
                 <div class="media-body">
@@ -211,12 +223,3 @@
     </div>	
   </div>
 @endsection
-
-@push('scripts')
-<script src="js/simplePlayer.js"></script>
-<script>
-	$("document").ready(function() {
-		$("#video").simplePlayer();
-	});
-</script>
-@endpush

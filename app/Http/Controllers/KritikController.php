@@ -2,65 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kritik;
-use App\Http\Requests\StoreKritikRequest;
-use App\Http\Requests\UpdateKritikRequest;
+use App\Models\{Film, Kritik};
+use Illuminate\Http\Request;
 
 class KritikController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Hanya user biasa yang boleh memberi komentar/kritik
+    public function store(Request $request, Film $film)
     {
-        //
-    }
+        if ($request->user()->isAdmin()) {
+            abort(403, 'Administrator tidak dapat memberikan komentar pada film.');
+        }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $data = $request->validate([
+            'rating'  => 'required|integer|min:1|max:5',
+            'comment' => 'required|string|max:1000',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreKritikRequest $request)
-    {
-        //
-    }
+        Kritik::create([
+            'comment' => $data['comment'],
+            'rating'  => $data['rating'],
+            'film_id' => $film->id,
+            'user_id' => $request->user()->id,
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Kritik $kritik)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Kritik $kritik)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateKritikRequest $request, Kritik $kritik)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Kritik $kritik)
-    {
-        //
+        return redirect()->route('movies.show', $film->id)->with('success', 'Komentar berhasil dikirim.');
     }
 }
